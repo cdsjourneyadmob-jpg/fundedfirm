@@ -1,28 +1,42 @@
 # Render Blueprint: runs the FundedFirm register/verify loop as a background worker.
 #
-# Deploy:
-#   1. Push this repo to GitHub/GitLab.
-#   2. In Render: New > Blueprint, point it at the repo.
-#   3. Render reads this file, builds the Docker image, attaches the disk, and starts the worker.
+# Persistence: accounts are committed back to this GitHub repo (accounts.txt),
+# so no paid persistent disk is needed — this runs on the FREE plan.
 #
-# The persistent disk keeps accounts.txt across restarts/deploys.
+# Deploy:
+#   1. Push this repo to GitHub.
+#   2. In Render: New > Blueprint, point it at the repo.
+#   3. Set the secret env vars below (GITHUB_TOKEN) in the dashboard.
+#
 services:
   - type: worker
     name: fundedfirm-account-loop
     runtime: docker
     dockerfilePath: ./Dockerfile
-    plan: starter          # smallest paid plan; required for a persistent disk + always-on worker
+    plan: free
     autoDeploy: true
     envVars:
-      - key: DATA_DIR
-        value: /data
+      # --- cadence ---
       - key: BASE_DELAY
         value: "90"        # base seconds between accounts
       - key: JITTER
         value: "60"        # extra random seconds (0..JITTER)
+
+      # --- git persistence (commit accounts.txt back to the repo) ---
+      - key: GIT_PUSH
+        value: "1"
+      - key: GIT_REPO_SLUG
+        value: "cdsjourneyadmob-jpg/fundedfirm"
+      - key: GIT_BRANCH
+        value: "main"
+      - key: GIT_AUTHOR_NAME
+        value: "fundedfirm-bot"
+      - key: GIT_AUTHOR_EMAIL
+        value: "bot@fundedfirm.local"
+      # Set this in the dashboard (fine-grained PAT with Contents: read/write on the repo).
+      - key: GITHUB_TOKEN
+        sync: false
+
+      # --- optional ---
       - key: FF_PASSWORD
-        sync: false        # set your own password in the Render dashboard (optional)
-    disk:
-      name: accounts-data
-      mountPath: /data
-      sizeGB: 1
+        sync: false

@@ -1,0 +1,2 @@
+# FundedFirm accounts (created by register_verify.sh)
+# created_at | name | email | password | phone | verified | id | auth_token

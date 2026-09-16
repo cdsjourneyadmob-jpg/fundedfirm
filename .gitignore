@@ -1,5 +1,5 @@
 # Sensitive / local-only files — never commit these
-accounts.txt
+# NOTE: accounts.txt IS tracked on purpose — it's our GitHub-based persistence store.
 *.har
 main.js
 gurelamail.txt

@@ -190,5 +190,44 @@ echo "      password: $PASSWORD"
 echo "      phone:    $PHONE"
 echo "      verified: $VERIFIED"
 
+# ---------------------------------------------------------------------------
+# 7) Optionally commit accounts.txt back to GitHub (free persistence).
+#    Enabled when GIT_PUSH=1 and a repo checkout exists at REPO_DIR.
+#    Auth uses GITHUB_TOKEN (set in the Render dashboard, never in code).
+# ---------------------------------------------------------------------------
+if [ "${GIT_PUSH:-0}" = "1" ]; then
+  log "==> [7] Committing accounts.txt to GitHub"
+  REPO_DIR="${REPO_DIR:-$(dirname "$0")}"
+  (
+    cd "$REPO_DIR" || exit 0
+    # Configure identity (idempotent)
+    git config user.email "${GIT_AUTHOR_EMAIL:-bot@fundedfirm.local}" 2>/dev/null || true
+    git config user.name  "${GIT_AUTHOR_NAME:-fundedfirm-bot}" 2>/dev/null || true
+
+    git add "$ACCOUNTS_FILE" 2>/dev/null || true
+    if git diff --cached --quiet 2>/dev/null; then
+      echo "    nothing to commit"
+      exit 0
+    fi
+    git commit -q -m "account: $EMAIL ($CREATED_AT)" || { echo "    commit failed"; exit 0; }
+
+    # Push using token auth if provided; retry once after a rebase on conflict
+    if [ -n "${GITHUB_TOKEN:-}" ] && [ -n "${GIT_REPO_SLUG:-}" ]; then
+      REMOTE="https://x-access-token:${GITHUB_TOKEN}@github.com/${GIT_REPO_SLUG}.git"
+      if ! git push -q "$REMOTE" HEAD:"${GIT_BRANCH:-main}" 2>/dev/null; then
+        git pull -q --rebase "$REMOTE" "${GIT_BRANCH:-main}" 2>/dev/null || true
+        git push -q "$REMOTE" HEAD:"${GIT_BRANCH:-main}" 2>/dev/null \
+          && echo "    pushed (after rebase)" || echo "    push failed"
+      else
+        echo "    pushed"
+      fi
+    else
+      # No token: push to whatever origin is configured (local dev)
+      git push -q origin HEAD:"${GIT_BRANCH:-main}" 2>/dev/null \
+        && echo "    pushed via origin" || echo "    (no GITHUB_TOKEN; committed locally only)"
+    fi
+  )
+fi
+
 echo
 log "==> Done. Account email: $EMAIL  (verified=$VERIFIED)"
