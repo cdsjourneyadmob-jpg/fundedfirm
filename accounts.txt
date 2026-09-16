@@ -1,2 +1,3 @@
 # FundedFirm accounts (created by register_verify.sh)
 # created_at | name | email | password | phone | verified | id | auth_token
+2026-09-16 19:59:33 UTC | Richard Carter | richardcarter728540b1@guerrillamailblock.com | Harrylove@8018 | +917465762118 | True | 6aaaf512bb4f33af80a0d5ee | eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNmFhYWY1MTJiYjRmMzNhZjgwYTBkNWVlIiwiaWF0IjoxNzg5NTg4NzcyLCJleHAiOjE3ODk2NzUxNzJ9.prs-iy7tULbcvAFKGN7ldzPzQB9ZVqPaC6jMSuzPXaU
