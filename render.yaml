@@ -26,6 +26,10 @@ services:
       - key: JITTER
         value: "60"        # extra random seconds (0..JITTER)
 
+      # --- keep-alive (self-ping so the free web service doesn't idle) ---
+      - key: KEEPALIVE_SECS
+        value: "600"       # ping own URL every 10 min (< Render's ~15min idle window)
+
       # --- git persistence (commit accounts.txt back to the repo) ---
       - key: GIT_PUSH
         value: "1"
