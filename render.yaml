@@ -9,12 +9,16 @@
 #   3. Set the secret env vars below (GITHUB_TOKEN) in the dashboard.
 #
 services:
-  - type: worker
+  # NOTE: Render's FREE tier only allows `web` services (not background workers),
+  # so we run a tiny HTTP server that also launches the loop in the background.
+  # Caveat: free web services sleep after ~15 min without inbound traffic.
+  - type: web
     name: fundedfirm-account-loop
     runtime: docker
     dockerfilePath: ./Dockerfile
     plan: free
     autoDeploy: true
+    healthCheckPath: /
     envVars:
       # --- cadence ---
       - key: BASE_DELAY

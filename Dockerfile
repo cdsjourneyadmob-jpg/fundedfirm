@@ -10,7 +10,7 @@ RUN apt-get update \
 WORKDIR /app
 
 # Baked-in copy (fallback if the runtime git clone fails)
-COPY register_verify.sh run_loop.sh entrypoint.sh /app/
+COPY register_verify.sh run_loop.sh entrypoint.sh server.py /app/
 RUN chmod +x /app/register_verify.sh /app/run_loop.sh /app/entrypoint.sh
 
 # Commit accounts back to GitHub (free persistence). Set token/slug in Render env.

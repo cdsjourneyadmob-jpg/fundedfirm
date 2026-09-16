@@ -33,4 +33,13 @@ export REPO_DIR="$WORK"
 echo "[entrypoint] WORK=$WORK GIT_PUSH=${GIT_PUSH:-0}"
 cd "$WORK"
 chmod +x ./register_verify.sh ./run_loop.sh 2>/dev/null || true
-exec bash ./run_loop.sh
+
+# On Render free tier this must be a WEB service, so serve HTTP on $PORT.
+# server.py binds the port AND launches run_loop.sh in the background.
+# If PORT isn't set (e.g. local/worker), just run the loop directly.
+if [ -n "${PORT:-}" ]; then
+  export REPO_DIR="$WORK"
+  exec python3 ./server.py
+else
+  exec bash ./run_loop.sh
+fi
