@@ -1,0 +1,8 @@
+# Sensitive / local-only files — never commit these
+accounts.txt
+*.har
+main.js
+gurelamail.txt
+usedmail.txt
+loop.log
+.claude/

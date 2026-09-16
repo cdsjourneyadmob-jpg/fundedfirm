@@ -1,0 +1,28 @@
+# Render Blueprint: runs the FundedFirm register/verify loop as a background worker.
+#
+# Deploy:
+#   1. Push this repo to GitHub/GitLab.
+#   2. In Render: New > Blueprint, point it at the repo.
+#   3. Render reads this file, builds the Docker image, attaches the disk, and starts the worker.
+#
+# The persistent disk keeps accounts.txt across restarts/deploys.
+services:
+  - type: worker
+    name: fundedfirm-account-loop
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter          # smallest paid plan; required for a persistent disk + always-on worker
+    autoDeploy: true
+    envVars:
+      - key: DATA_DIR
+        value: /data
+      - key: BASE_DELAY
+        value: "90"        # base seconds between accounts
+      - key: JITTER
+        value: "60"        # extra random seconds (0..JITTER)
+      - key: FF_PASSWORD
+        sync: false        # set your own password in the Render dashboard (optional)
+    disk:
+      name: accounts-data
+      mountPath: /data
+      sizeGB: 1

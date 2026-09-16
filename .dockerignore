@@ -1,0 +1,9 @@
+# Keep the image small and avoid shipping sensitive/irrelevant files
+*.har
+main.js
+gurelamail.txt
+usedmail.txt
+accounts.txt
+loop.log
+.claude
+.git
